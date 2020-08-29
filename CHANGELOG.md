@@ -2,8 +2,32 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.2.1 (2020-08-27)
 
+- [Bugfix] Upgrade all services to open-release/juniper.3
+- [Bugfix] Fix upload of video transcripts to S3
+- [Improvement] Memorize whether the user is running a production platform during interactive configuration
+
+## v10.2.0 (2020-08-16)
+
+- [Bugfix] Fix incorrect loading of some resources from localhost:18000 in development
+- [Bugfix] Fix Samesite=None Secure=False cookie error for users accessing the LMS with the latest release of Google Chrome
+- [Security] Apply javascript security patch ([pull request](https://github.com/edx/edx-platform/pull/24762))
+- [Bugfix] Fix "FileError" on Scorm package upload in Scorm XBlock
+- �[Improvement] Serve openedx static assets with [whitenoise](http://whitenoise.evans.io/en/stable/) instead of nginx. This removes the `k8s-deployments-nginx-init-containers` patch. Plugins are encouraged to implement static asset serving with Whitenoise as well.
+- [Bugfix] Fix dependency on mysql service when mysql is not activated
+- [Improvement] Improve openedx Docker image build time and size with multi-stage build
+- �[Feature] Get rid of outdated sysadmin dashboard in LMS at /sysadmin
+
+## v10.1.0 (2020-07-23)
+
+- [Security] Apply edx-platform upstream xss security fixes ([pull request](https://github.com/edx/edx-platform/pull/24568))
+- �[Feature] Make it possible to override the docker registry for just a few services by setting `DOCKER_IMAGE_SERVICENAME` values.
+
+## v10.0.11 (2020-07-16)
+
+- [Feature] Upgrade all repositories to open-release/juniper.3
+- [Bugfix] Fix `reload-gunicorn` command
 - [Feature] Enable sysadmin dashboard in LMS at /sysadmin
 
 ## v10.0.10 (2020-07-01)

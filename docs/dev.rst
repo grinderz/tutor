@@ -54,7 +54,7 @@ You can then import edx-platform and django modules and execute python code.
 
 To collect assets, you can use the ``openedx-assets`` command that ships with Tutor::
 
-    tutor dev run openedx-assets --env=dev
+    tutor dev run lms openedx-assets --env=dev
 
 Point to a local edx-platform
 -----------------------------
@@ -100,7 +100,7 @@ In order to run a fork of edx-platform, dependencies need to be properly install
     tutor dev run -v /path/to/edx-platform:/openedx/edx-platform lms bash
     pip install --requirement requirements/edx/development.txt
     python setup.py install
-    paver update_assets --settings=tutor.development
+    openedx-assets build --env=dev
 
 Debug edx-platform
 ~~~~~~~~~~~~~~~~~~
@@ -125,7 +125,7 @@ The ``requirements`` folder should have the following content::
             ...
 
 You will have to re-build the openedx Docker image once::
-    
+
     tutor images build openedx
 
 You should then run the development server as usual, with ``runserver``. Every change made to the ``mypackage`` folder will be picked up and the development server will be automatically reloaded.
