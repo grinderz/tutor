@@ -11,5 +11,7 @@ FEATURES["PREVIEW_LMS_BASE"] = "preview." + LMS_BASE
 # Setup correct webpack configuration file for development
 WEBPACK_CONFIG_PATH = "webpack.dev.config.js"
 
+MIDDLEWARE.insert(0, "whitenoise.middleware.WhiteNoiseMiddleware")
+
 {{ patch("openedx-development-settings") }}
 {{ patch("openedx-cms-development-settings") }}
