@@ -2,6 +2,16 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## v10.2.2 (2020-09-05)
+
+- [Improvement] Add CORS basic configuration to LMS for subdomains of the LMS
+- [Feature] Add support for `images build --add-host` option (thanks @grinderz!)
+- [Bugfix] Fix podman compatibility by replacing `docker-compose rm` command by `docker-compose stop` when stopping containers
+- [Improvement] Improve plugin data deletion
+- [Improvement] Introduce the `OPENEDX_COMMON_VERSION` setting
+- [Bugfix] Make it possible to run init jobs without starting the entire platform
+- [Improvement] Reduce "openedx" Docker image size with static asset de-duplication
+
 ## v10.2.1 (2020-08-27)
 
 - [Bugfix] Upgrade all services to open-release/juniper.3

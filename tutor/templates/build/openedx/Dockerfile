@@ -28,7 +28,7 @@ RUN curl -L -o /tmp/dockerize.tar.gz https://github.com/jwilder/dockerize/releas
 ###### Checkout edx-platform code
 FROM minimal as code
 ARG EDX_PLATFORM_REPOSITORY=https://github.com/edx/edx-platform.git
-ARG EDX_PLATFORM_VERSION=open-release/juniper.1
+ARG EDX_PLATFORM_VERSION={{ OPENEDX_COMMON_VERSION }}
 RUN mkdir -p /openedx/edx-platform && \
     git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 /openedx/edx-platform
 WORKDIR /openedx/edx-platform
@@ -113,7 +113,7 @@ RUN npm install --verbose --registry=$NPM_REGISTRY
 FROM minimal as production
 
 # Install system requirements
-RUN apt install -y gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libmysqlclient-dev libpng12-dev libsqlite3-dev libxmlsec1-dev lynx ntp pkg-config \
+RUN apt install -y gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libmysqlclient-dev libpng12-dev libsqlite3-dev libxmlsec1-dev lynx ntp pkg-config rdfind \
 && rm -rf /var/lib/apt/lists/*
 
 COPY --from=dockerize /usr/local/bin/dockerize /usr/local/bin/dockerize
@@ -179,7 +179,9 @@ RUN openedx-assets xmodule \
     && openedx-assets common
 COPY ./themes/ /openedx/themes/
 RUN openedx-assets themes \
-    && openedx-assets collect --settings=tutor.assets
+    && openedx-assets collect --settings=tutor.assets \
+    # De-duplicate static assets with symlinks
+    && rdfind -makesymlinks true -followsymlinks true /openedx/staticfiles/
 
 # Create a data directory, which might be used (or not)
 RUN mkdir /openedx/data
