@@ -20,7 +20,7 @@ def images_command():
     short_help="Build docker images",
     help="Build the docker images necessary for an Open edX platform.",
 )
-@click.argument("image", nargs=-1)
+@click.argument("image_names", metavar="image", nargs=-1)
 @click.option(
     "--no-cache", is_flag=True, help="Do not use cache when building the image"
 )
@@ -38,7 +38,7 @@ def images_command():
     help="Set a custom host-to-IP mapping (host:ip).",
 )
 @click.pass_obj
-def build(context, image, no_cache, build_args, add_hosts):
+def build(context, image_names, no_cache, build_args, add_hosts):
     config = tutor_config.load(context.root)
     command_args = []
     if no_cache:
@@ -47,88 +47,88 @@ def build(context, image, no_cache, build_args, add_hosts):
         command_args += ["--build-arg", build_arg]
     for add_host in add_hosts:
         command_args += ["--add-host", add_host]
-    for i in image:
-        build_image(context.root, config, i, *command_args)
+    for image in image_names:
+        build_image(context.root, config, image, *command_args)
+
+
+@click.command(short_help="Pull images from the Docker registry")
+@click.argument("image_names", metavar="image", nargs=-1)
+@click.pass_obj
+def pull(context, image_names):
+    config = tutor_config.load(context.root)
+    for image in image_names:
+        pull_image(config, image)
+
+
+@click.command(short_help="Push images to the Docker registry")
+@click.argument("image_names", metavar="image", nargs=-1)
+@click.pass_obj
+def push(context, image_names):
+    config = tutor_config.load(context.root)
+    for image in image_names:
+        push_image(config, image)
+
+
+@click.command(short_help="Print tag associated to a Docker image")
+@click.argument("image_names", metavar="image", nargs=-1)
+@click.pass_obj
+def printtag(context, image_names):
+    config = tutor_config.load(context.root)
+    for image in image_names:
+        for _img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
+            print(tag)
+        for _img, tag in iter_plugin_images(config, image, "build-image"):
+            print(tag)
 
 
 def build_image(root, config, image, *args):
     # Build base images
-    for img in BASE_IMAGE_NAMES:
-        if image in [img, "all"]:
-            tag = images.get_tag(config, img)
-            images.build(tutor_env.pathjoin(root, "build", img), tag, *args)
+    for img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
+        images.build(tutor_env.pathjoin(root, "build", img), tag, *args)
 
     # Build plugin images
-    for plugin, hook in plugins.iter_hooks(config, "build-image"):
-        for img, tag in hook.items():
-            if image in [img, "all"]:
-                tag = tutor_env.render_str(config, tag)
-                images.build(
-                    tutor_env.pathjoin(root, "plugins", plugin, "build", img),
-                    tag,
-                    *args
-                )
+    for plugin, img, tag in iter_plugin_images(config, image, "build-image"):
+        images.build(
+            tutor_env.pathjoin(root, "plugins", plugin, "build", img), tag, *args
+        )
 
     # Build dev images with user id argument
     user_id = subprocess.check_output(["id", "-u"]).strip().decode()
     dev_build_arg = ["--build-arg", "USERID={}".format(user_id)]
-    for img in DEV_IMAGE_NAMES:
-        if image in [img, "all"]:
-            tag = images.get_tag(config, img)
-            images.build(
-                tutor_env.pathjoin(root, "build", img), tag, *dev_build_arg, *args
-            )
-
-
-@click.command(short_help="Pull images from the Docker registry")
-@click.argument("image", nargs=-1)
-@click.pass_obj
-def pull(context, image):
-    config = tutor_config.load(context.root)
-    for i in image:
-        pull_image(config, i)
+    for img, tag in iter_images(config, image, DEV_IMAGE_NAMES):
+        images.build(tutor_env.pathjoin(root, "build", img), tag, *dev_build_arg, *args)
 
 
 def pull_image(config, image):
-    # Pull base images
-    for img in image_names(config):
-        if image in [img, "all"]:
-            tag = images.get_tag(config, img)
-            images.pull(tag)
-
-    # Pull plugin images
-    for _plugin, hook in plugins.iter_hooks(config, "remote-image"):
-        for img, tag in hook.items():
-            if image in [img, "all"]:
-                tag = tutor_env.render_str(config, tag)
-                images.pull(tag)
-
-
-@click.command(short_help="Push images to the Docker registry")
-@click.argument("image", nargs=-1)
-@click.pass_obj
-def push(context, image):
-    config = tutor_config.load(context.root)
-    for i in image:
-        push_image(config, i)
+    for _img, tag in iter_images(config, image, all_image_names(config)):
+        images.pull(tag)
+    for _plugin, _img, tag in iter_plugin_images(config, image, "remote-image"):
+        images.pull(tag)
 
 
 def push_image(config, image):
-    # Push base images
-    for img in BASE_IMAGE_NAMES:
+    for _img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
+        images.push(tag)
+    for _plugin, _img, tag in iter_plugin_images(config, image, "remote-image"):
+        images.push(tag)
+
+
+def iter_images(config, image, image_list):
+    for img in image_list:
         if image in [img, "all"]:
             tag = images.get_tag(config, img)
-            images.push(tag)
+            yield img, tag
 
-    # Push plugin images
-    for _plugin, hook in plugins.iter_hooks(config, "remote-image"):
+
+def iter_plugin_images(config, image, hook_name):
+    for plugin, hook in plugins.iter_hooks(config, hook_name):
         for img, tag in hook.items():
             if image in [img, "all"]:
                 tag = tutor_env.render_str(config, tag)
-                images.push(tag)
+                yield plugin, img, tag
 
 
-def image_names(config):
+def all_image_names(config):
     return BASE_IMAGE_NAMES + vendor_image_names(config)
 
 
@@ -151,3 +151,4 @@ def vendor_image_names(config):
 images_command.add_command(build)
 images_command.add_command(pull)
 images_command.add_command(push)
+images_command.add_command(printtag)

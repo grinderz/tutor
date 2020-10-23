@@ -14,24 +14,20 @@ from .__about__ import __version__
 
 TEMPLATES_ROOT = pkg_resources.resource_filename("tutor", "templates")
 VERSION_FILENAME = "version"
-BIN_FILE_EXTENSIONS = [".ico", ".jpg", ".png", ".ttf"]
+BIN_FILE_EXTENSIONS = [".ico", ".jpg", ".png", ".ttf", ".woff", ".woff2"]
 
 
 class Renderer:
-    INSTANCE = None
-
     @classmethod
     def instance(cls, config):
-        if cls.INSTANCE is None or cls.INSTANCE.config != config:
-            # Load template roots: these are required to be able to use
-            # {% include .. %} directives
-            template_roots = [TEMPLATES_ROOT]
-            for plugin in plugins.iter_enabled(config):
-                if plugin.templates_root:
-                    template_roots.append(plugin.templates_root)
+        # Load template roots: these are required to be able to use
+        # {% include .. %} directives
+        template_roots = [TEMPLATES_ROOT]
+        for plugin in plugins.iter_enabled(config):
+            if plugin.templates_root:
+                template_roots.append(plugin.templates_root)
 
-            cls.INSTANCE = cls(config, template_roots, ignore_folders=["partials"])
-        return cls.INSTANCE
+        return cls(config, template_roots, ignore_folders=["partials"])
 
     @classmethod
     def reset(cls):

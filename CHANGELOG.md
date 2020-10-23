@@ -2,6 +2,33 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Run `apt update` before `apt install` when installing deps in the openedx Dockerfile
+
+## v10.3.1 (2020-10-16)
+
+- [Improvement] Make all commands considerably faster
+- [Improvement] Make it easier to override Mongodb connection parameters
+- [Bugfix] Add support for .woff and .woff2 font files in themes (thanks @mrtndwrd!)
+
+## v10.3.0 (2020-10-13)
+
+- �[Improvement] Simplify CORS configuration
+
+## v10.2.4 (2020-10-06)
+
+- [Bugfix] Fix Apache proxy configuration when HTTPS is enabled (#370)
+
+## v10.2.3 (2020-10-02)
+
+- [Feature] Add ``images printtag`` command
+- [Improvement] Make it possible to override individual contact email addresses with plugins
+- [Bugfix] Replace "no-reply@LMS_BASE" email address by regular contact email address
+- [Bugfix] Disable learner records globally by default
+- [Improvement] Upgrade to the latest release of MySQL 5.6
+- [Improvement] Non-plugin settings added by "set" directives are now automatically removed when the plugin is disabled (#241)
+
 ## v10.2.2 (2020-09-05)
 
 - [Improvement] Add CORS basic configuration to LMS for subdomains of the LMS
@@ -136,7 +163,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## v3.11.11 (2020-04-15)
 
 - [Bugfix] Make sure all emails (including "password reset") are properly saved to a local file in development mode (#315)
-- [Improvement] Add `openedx-development-settings` patch to patch the LMS and the CMS simultaneously in development 
+- [Improvement] Add `openedx-development-settings` patch to patch the LMS and the CMS simultaneously in development
 - [Bugfix] Fix missing celery tasks in the CMS
 
 ## v3.11.10 (2020-04-14)
@@ -430,7 +457,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 - [Feature] Add cloud deployment script
 - [Improvement] Run `images pull` command
-- [Improvement] Run `indexcourses` on importing demo course 
+- [Improvement] Run `indexcourses` on importing demo course
 - [Improvement] Add `runserver stop` command
 
 ## 3.0.4 (2019-02-13)
