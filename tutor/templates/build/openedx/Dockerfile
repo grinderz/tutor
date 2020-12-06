@@ -85,7 +85,7 @@ RUN pip install -r ./requirements/edx/base.txt
 RUN pip install https://github.com/overhangio/edx-ora2/archive/overhangio/boto2to3.zip
 
 # Install scorm xblock
-RUN pip install "openedx-scorm-xblock<11.0.0,>=10.0.0"
+RUN pip install "openedx-scorm-xblock<11.0.0,>=10.0.1"
 
 # Install whitenoise, for serving static assets
 RUN pip install "whitenoise==5.1.0"
@@ -200,4 +200,4 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 # Run server
 COPY gunicorn_conf.py /openedx/gunicorn_conf.py
 EXPOSE 8000
-CMD gunicorn -c /openedx/gunicorn_conf.py --name ${SERVICE_VARIANT} --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - ${SERVICE_VARIANT}.wsgi:application
+CMD gunicorn -c /openedx/gunicorn_conf.py --name ${SERVICE_VARIANT} --bind=0.0.0.0:8000 --max-requests=1000 --max-requests-jitter=100 --access-logfile - ${SERVICE_VARIANT}.wsgi:application

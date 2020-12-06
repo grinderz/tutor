@@ -2,8 +2,36 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.5.1 (2020-11-30)
 
+- [Bugfix] Fix Dockerfile parsing on Windows
+- [Improvement] Add option to patch lms and cms nginx server blocks
+
+## v10.5.0 (2020-11-19)
+
+- �[Improvement] Remove `dev/local pullimages`. Instead, run `dev/local dc pull`.
+- �[Improvement] Add `dev dc` and `local dc` commands as thin wrappers of the `docker-compose` CLI.
+- �[Improvement] Remove the undocumented `local run_hook` command. Instead, run `local init --limit=...`.
+- �[Improvement] Remove `tutor android pullimage` command. Instead, run `tutor images pull android`.
+- [Bugfix] Fix `config save` on Windows.
+- [Bugfix] Fix platform checking in user ID function
+
+## v10.4.1 (2020-11-11)
+
+- [Bugfix] Fix dependency error during `pip install tutor` due to urllib3 incompatibility
+- [Bugfix] Fix user ID checking under Windows.
+- [Bugfix] Fix template rendering for Windows users.
+- [Improvement] Switch to `bcrypt` for htpasswd password generation, for better portability on Windows.
+- [Improvement] In the openedx production docker image, add some jitter to the gunicorn worker restart process to prevent all workers from restarting at the same time.
+
+## v10.4.0 (2020-10-30)
+
+**Note for users of the [Tutor AMI](https://aws.amazon.com/marketplace/pp/B07PV3TB8X):** To upgrade from a previous v10 release, run:
+
+    curl -fsSL https://overhang.io/tutor/ami/upgrade.sh | sh
+
+- [Improvement] Mount config and setting files in read-only mode
+- �[Improvement] Enable unit completion tracking by default.
 - [Bugfix] Run `apt update` before `apt install` when installing deps in the openedx Dockerfile
 
 ## v10.3.1 (2020-10-16)
